@@ -1,3 +1,4 @@
+# 이 코드는 mariadb에 지문 데이터를 저장하고 불러오는 코드입니다
 import pymysql
 import json
 import time
