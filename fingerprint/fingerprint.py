@@ -57,10 +57,6 @@ def register_fingerprint(user_id):
         conn.close()
 
 # ✅ 지문 인증
-import pymysql
-from pyfingerprint.pyfingerprint import PyFingerprint
-from db import get_db_connection
-
 def verify_fingerprint(user_id):
     """저장된 지문과 사용자의 지문을 비교하여 인증을 수행"""
     sensor = initialize_sensor()
