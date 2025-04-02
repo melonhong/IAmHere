@@ -45,7 +45,7 @@ def update_detected_time(mac_address):
             conn.close()
 
 # 새로운 기기를 데이터베이스에 추가
-def add_device(mac_address, name, device_type="bluetooth"):
+def add_device(mac_address, name):
     conn = None
     try:
         conn = get_db_connection()
