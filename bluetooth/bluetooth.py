@@ -3,8 +3,8 @@ import re
 import datetime
 from db import get_db_connection
 
+# 블루투스 기기 스캔 후 MAC 주소와 이름 리스트 반환
 def scan_bluetooth_devices():
-    """ 블루투스 기기 스캔 후 MAC 주소와 이름 리스트 반환 """
     try:
         subprocess.run(["bluetoothctl", "--timeout", "5", "scan", "on"], check=True)
         result = subprocess.run(["bluetoothctl", "devices"], capture_output=True, text=True)
@@ -21,8 +21,8 @@ def scan_bluetooth_devices():
         print(f"❌ 블루투스 스캔 실패: {e}")
         return []
 
+# 데이터베이스에서 해당 MAC 주소의 last_detected 필드 업데이트
 def update_detected_time(mac_address):
-    """ 데이터베이스에서 해당 MAC 주소의 last_detected 필드 업데이트 """
     conn = None
     try:
         conn = get_db_connection()
@@ -44,8 +44,8 @@ def update_detected_time(mac_address):
         if conn:
             conn.close()
 
+# 새로운 기기를 데이터베이스에 추가
 def add_device(mac_address, name, device_type="bluetooth"):
-    """ 새로운 기기 추가 (블루투스/지문인식 공통) """
     conn = None
     try:
         conn = get_db_connection()
