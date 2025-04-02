@@ -4,7 +4,7 @@ import time
 from pyfingerprint.pyfingerprint import PyFingerprint
 from db import get_db_connection
 
-# ✅ 지문 센서 초기화
+# 지문 센서 초기화
 def initialize_sensor():
     start_time = time.time()
     sensor = None
@@ -21,7 +21,7 @@ def initialize_sensor():
     print("❌ 지문 센서 응답 시간 초과 (5초)")
     return None
 
-# ✅ 지문 등록
+# 지문 등록
 def register_fingerprint(user_id):
     sensor = initialize_sensor()
     if not sensor:
@@ -56,7 +56,7 @@ def register_fingerprint(user_id):
         cursor.close()
         conn.close()
 
-# ✅ 지문 인증
+# 지문 인증
 def verify_fingerprint(user_id):
     """저장된 지문과 사용자의 지문을 비교하여 인증을 수행"""
     sensor = initialize_sensor()
@@ -70,7 +70,7 @@ def verify_fingerprint(user_id):
         cursor.execute("SELECT fingerprint FROM fingerprints WHERE user_id = %s", (user_id,))
         result = cursor.fetchone()
 
-        # ✅ 데이터가 없는 경우 예외 처리
+        # 데이터가 없는 경우 예외 처리
         if not result:
             print("❌ 해당 사용자 ID의 지문 데이터가 없습니다.")
             return False
