@@ -12,9 +12,9 @@ cursor = conn.cursor()
 # 출석 테이블 생성
 cursor.execute('''
     CREATE TABLE (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
 ''')
 
