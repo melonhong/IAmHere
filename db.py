@@ -1,9 +1,8 @@
 import pymysql
 from config import DB_CONFIG  # config.py에서 DB 설정 불러오기
 
-# ✅ 데이터베이스 연결 함수
+# 데이터베이스 연결 함수
 def get_db_connection():
-    """ MySQL 데이터베이스 연결을 반환하는 함수 """
     return pymysql.connect(
         host=DB_CONFIG["host"],
         user=DB_CONFIG["user"],
@@ -13,30 +12,80 @@ def get_db_connection():
         cursorclass=pymysql.cursors.DictCursor
     )
 
-# ✅ 테이블 생성 함수
+# 테이블 생성 함수
 def initialize_database():
-    """ 블루투스 및 지문 테이블을 생성하는 함수 (최초 1회 실행) """
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # ✅ 블루투스 기기 테이블 생성
+    # users 테이블
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS devices (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            mac_address VARCHAR(17) UNIQUE NOT NULL,
-            name VARCHAR(255),
-            added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            last_detected DATETIME
+        CREATE TABLE IF NOT EXISTS users (
+            user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            student_id VARCHAR(100) NOT NULL,
+            name VARCHAR(100) NOT NULL,
+            major VARCHAR(255) NOT NULL
         )
     """)
 
-    # ✅ 지문 데이터 테이블 생성
+    # lectures 테이블
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS lectures (
+            lecture_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            title VARCHAR(255) NOT NULL,
+            day ENUM('월','화','수','목','금') NOT NULL,
+            start_time TIME NOT NULL,
+            end_time TIME NOT NULL,
+            start_date DATE NOT NULL,
+            end_date DATE NOT NULL
+        )
+    """)
+
+    # fingerprints 테이블
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS fingerprints (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT UNIQUE NOT NULL,
-            fingerprint TEXT NOT NULL,
-            added_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            user_id BIGINT PRIMARY KEY NOT NULL,
+            fingerprint_template TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+        )
+    """)
+
+    # bluetooth_devices 테이블
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS bluetooth_devices (
+            device_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            user_id BIGINT NOT NULL,
+            mac_address VARCHAR(17) UNIQUE NOT NULL,
+            device_name VARCHAR(255),
+            registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+        )
+    """)
+
+    # enrollments 테이블
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS enrollments (
+            enrollment_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            user_id BIGINT NOT NULL,
+            lecture_id BIGINT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(user_id),
+            FOREIGN KEY (lecture_id) REFERENCES lectures(lecture_id) ON DELETE CASCADE,
+            UNIQUE(user_id, lecture_id)
+        )
+    """)
+
+    # attendances 테이블
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS attendances (
+            attendance_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+            user_id BIGINT,
+            lecture_id BIGINT,
+            method ENUM('Bluetooth', 'Fingerprint', 'Both') NOT NULL,
+            mac_address VARCHAR(17),
+            check_in TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            status ENUM('1차출석완료', '1차출석실패', '2차출석완료', '2차출석실패', '2차출석제외') NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL,
+            FOREIGN KEY (lecture_id) REFERENCES lectures(lecture_id) ON DELETE SET NULL,
+            FOREIGN KEY (mac_address) REFERENCES bluetooth_devices(mac_address) ON DELETE SET NULL
         )
     """)
 
