@@ -156,9 +156,10 @@ def main():
         print("2. 블루투스 장치 추가")
         print("3. 지문 인식")
         print("4. 지문 등록")
+        print("5. 블루투스 출석")
         print("0. 종료")
 
-        choice = input("선택 (0-4): ").strip()
+        choice = input("선택 (0-5): ").strip()
 
         if choice == "1":
             print("=== 블루투스 기기 스캔 시작 ===")
@@ -177,6 +178,7 @@ def main():
 
         elif choice == "3":
             user_id = input("인증할 사용자 ID: ").strip()
+            fingerprint_attendance() # 지문 출석 연결
             if verify_fingerprint(user_id):
                 print("✅ 지문 인증 성공!!! 시스템 접근 허용")
             else:
@@ -186,6 +188,15 @@ def main():
             user_id = input("등록할 사용자 ID: ").strip()
             if register_fingerprint(user_id):
                 print("✅ 지문 등록 성공!")
+
+        elif choice == "5":
+            # 현재 수업 불러와서 하나라도 있으면 출석 시도
+            current_lectures = get_current_lectures()
+            if current_lectures:
+                for lecture_id in current_lectures:
+                    bluetooth_attendance(lecture_id)  #출석 함수 호출
+            else:
+                print("현재 출석 가능한 강의가 없습니다.")
 
         elif choice == "0":
             print("프로그램을 종료합니다.")
