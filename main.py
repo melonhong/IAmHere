@@ -47,11 +47,12 @@ def main():
         elif choice == "2":
             title = input("강의명: ").strip()
             day = input("요일 (월~금): ").strip()
+            lecturer_id = input("강의자 아이디: ").strip()
             start_time = input("시작 시간 (HH:MM:SS): ").strip()
             end_time = input("종료 시간 (HH:MM:SS): ").strip()
             start_date = input("시작 날짜 (YYYY-MM-DD): ").strip()
             end_date = input("종료 날짜 (YYYY-MM-DD): ").strip()
-            if add_lecture(title, day, start_time, end_time, start_date, end_date):
+            if add_lecture(title, day, lecturer_id, start_time, end_time, start_date, end_date):
                 print("✅ 강의 등록 완료")
             else:
                 print("❌ 강의 등록 실패")
