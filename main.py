@@ -1,10 +1,11 @@
-from bluetooth import scan_bluetooth_devices, add_device, get_mac_addresses_by_user_ids
+from bluetooth import *
 from fingerprint import register_fingerprint, verify_fingerprint
 from user import add_user
 from lecture import add_lecture
 from enrollment import add_enrollment, get_enrolled_user_ids
 from attendance import add_attendance
 from db import initialize_database
+import time
 
 def main():
     initialize_database()
@@ -88,6 +89,7 @@ def main():
             scanned_devices = scan_bluetooth_devices()
             scanned_macs = [mac for mac, _ in scanned_devices]
             print(scanned_macs)
+            scan_off()
 
             enrolled_users = get_enrolled_user_ids(lecture_id)
             user_mac_map = get_mac_addresses_by_user_ids(enrolled_users)
@@ -130,10 +132,34 @@ def main():
                 add_attendance(user_id, lecture_id, method="Fingerprint", status="2차출석제외")
                 print(f"⚠️ 사용자 {user_id}는 지문 인증 대상이 아니므로 2차출석제외 처리됨")
 
-        elif choice == "0":
-            print("프로그램을 종료합니다.")
-            break
+        elif choice == "8":
+            mac_addr = input("페어링 할 맥 주소: ")
+            pair_device(mac_addr)
 
+        elif choice == "9":
+            mac_addr = input("맥 주소: ")
+            print("블루투스가 연결되면 강의를 시작합니다...\n")
+
+            # 10초 동안 연결 시도
+            start_time = time.time()
+            connected = False
+
+            while time.time() - start_time < 10:
+                if is_connected(mac_addr):
+                    connected = True
+                    break
+                time.sleep(1)  # 1초마다 체크
+
+            if connected:
+                print("강의가 시작됐습니다.\n")
+                monitor_connection(mac_addr)
+            else:
+                print("⏰ 10초 내에 연결되지 않았습니다. 강의를 시작할 수 없습니다.\n")
+        
+        elif choice == "0":
+	            print("프로그램을 종료합니다.")
+	            break
+	    
         else:
             print("❌ 잘못된 입력입니다. 다시 시도하세요.")
 
