@@ -23,7 +23,8 @@ def initialize_database():
             user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
             student_id VARCHAR(100) NOT NULL,
             name VARCHAR(100) NOT NULL,
-            major VARCHAR(255) NOT NULL
+            major VARCHAR(255) NOT NULL,
+            role ENUM('강의자', '수강생') NOT NULL 
         )
     """)
 
@@ -33,10 +34,12 @@ def initialize_database():
             lecture_id BIGINT PRIMARY KEY AUTO_INCREMENT,
             title VARCHAR(255) NOT NULL,
             day ENUM('월','화','수','목','금') NOT NULL,
+            lecturer_id BIGINT NOT NULL,
             start_time TIME NOT NULL,
             end_time TIME NOT NULL,
             start_date DATE NOT NULL,
-            end_date DATE NOT NULL
+            end_date DATE NOT NULL,
+            FOREIGN KEY (lecturer_id) REFERENCES users(user_id) ON DELETE CASCADE
         )
     """)
 
