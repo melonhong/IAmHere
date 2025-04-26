@@ -14,6 +14,7 @@ def pair_device(mac_address):
         child.sendline('scan on')
         time.sleep(10)
         child.sendline('scan off')
+        # mac_address가 있는지 devices 명령어로 확인해야 함!
         child.sendline(f'pair {mac_address}')
 
         # 'yes' 입력을 기다린 후 자동으로 'yes' 입력
@@ -75,6 +76,6 @@ def monitor_connection(mac_address):
             if not is_connected(mac_address):
                 print("⚠️ 디바이스 연결이 끊어졌습니다!")
                 break
-            time.sleep(1)  # 1초마다 체크
+            time.sleep(10)  # 10초마다 체크
     except KeyboardInterrupt:
         print("\n🛑 모니터링을 수동으로 종료했습니다.")
