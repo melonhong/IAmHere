@@ -26,7 +26,20 @@ def main():
             student_id = input("학번 입력: ").strip()
             name = input("이름 입력: ").strip()
             major = input("전공 입력: ").strip()
-            if add_user(student_id, name, major):
+            roles = {
+                '1': '강의자',
+                '2': '수강생'
+            }
+            role = None
+
+            while role is None:
+                num = input("1번: 강의자, 2번: 수강생\n번호를 입력하세요: ")
+                role = roles.get(num)
+                if role:
+                    print(f"선택한 역할: {role}")
+                else:
+                    print(f"잘못된 입력입니다. 다시 선택해주세요.\n")
+            if add_user(student_id, name, major, role.strip()):
                 print("✅ 사용자 등록 완료")
             else:
                 print("❌ 사용자 등록 실패")

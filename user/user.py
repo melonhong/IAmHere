@@ -2,14 +2,14 @@ import pymysql
 from db import get_db_connection
 
 # 사용자 추가
-def add_user(student_id, name, major):
+def add_user(student_id, name, major, role):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            INSERT INTO users (student_id, name, major)
-            VALUES (%s, %s, %s)
-        """, (student_id, name, major))
+            INSERT INTO users (student_id, name, major, role)
+            VALUES (%s, %s, %s, %s)
+        """, (student_id, name, major, role))
         conn.commit()
         print(f"✅ 사용자 {name}이(가) 추가되었습니다.")
         return cursor.lastrowid  # 생성된 user_id 반환
