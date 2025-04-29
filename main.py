@@ -164,15 +164,14 @@ def main():
                         # 블루투스 출석 반복
                         print("========= 블루투스 기기 스캔 시작 =========")
                         scanned_devices = scan_bluetooth_devices()
-                        scanned_macs = [mac for mac, _ in scanned_devices]
-                        print(scanned_macs)
+                        print(scanned_devices)
 
                         enrolled_users = get_enrolled_user_ids(lecture_id)
                         user_mac_map = get_mac_addresses_by_user_ids(enrolled_users)
 
                         for user_id in enrolled_users:
                             mac = user_mac_map.get(user_id)
-                            if mac in scanned_macs:
+                            if mac in scanned_devices:
                                 result = add_attendance(user_id, lecture_id, method="Bluetooth", status="1차출석완료")
                                 print(f"✅ 사용자 {user_id} 출석 처리됨") if result else print(f"❌ 사용자 {user_id} 출석 실패")
                             else:
