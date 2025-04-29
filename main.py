@@ -155,6 +155,7 @@ def main():
 
             # 강의 시작
             print("✍️ 강의를 시작합니다. 모두 자리에 착석해주세요!")
+            misbehaving_students = []
             try:
                 while connected:
                     if not is_connected(mac_addr):
@@ -177,9 +178,13 @@ def main():
                             else:
                                 result = add_attendance(user_id, lecture_id, method="Bluetooth", status="1차출석실패")
                                 print(f"❌ 사용자 {user_id} 결석 처리됨") if result else print(f"⚠️ 사용자 {user_id} 결석 기록 실패")
+                                misbehaving_students.append(user_id)
                     time.sleep(10)  # 10초마다 체크
             except KeyboardInterrupt:
                 print("\n모니터링을 수동으로 종료했습니다.")
+
+            print(f"블루투스 출석을 실패한 학생들! 😡 지문 출석을 하세요!\n")
+            print(misbehaving_students)
 
         elif choice == "0":
 	            print("프로그램을 종료합니다.")
