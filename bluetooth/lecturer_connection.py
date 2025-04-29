@@ -2,8 +2,9 @@ import subprocess
 import time
 import pexpect
 import sys
+import re
 
-# 블루투스 기기 스캔 후 MAC 주소와 이름 리스트 반환
+# 블루투스 기기 스캔 후 MAC 주소  리스트 반환
 def scan_bluetooth_devices():
     try:
         subprocess.run(["bluetoothctl", "--timeout", "10", "scan", "on"], check=True)
@@ -15,7 +16,7 @@ def scan_bluetooth_devices():
             match = re.match(r"Device ([0-9A-Fa-f:]+) (.+)", device)
             if match:
                 mac_address, name = match.groups()
-                device_list.append((mac_address, name))
+                device_list.append(mac_address)
         print(device_list)
         return device_list
     except subprocess.CalledProcessError as e:
@@ -36,10 +37,6 @@ def pair_device(mac_address):
 
         # 블루투스 프롬프트가 뜰 때까지 대기
         child.expect('Agent registered')
-        child.sendline('scan on')
-        time.sleep(10)
-        child.sendline('scan off')
-        # mac_address가 있는지 devices 명령어로 확인해야 함!
         child.sendline(f'pair {mac_address}')
 
         # 'yes' 입력을 기다린 후 자동으로 'yes' 입력
