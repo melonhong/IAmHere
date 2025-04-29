@@ -3,9 +3,34 @@ import time
 import pexpect
 import sys
 
+# 블루투스 기기 스캔 후 MAC 주소와 이름 리스트 반환
+def scan_bluetooth_devices():
+    try:
+        subprocess.run(["bluetoothctl", "--timeout", "10", "scan", "on"], check=True)
+        result = subprocess.run(["bluetoothctl", "devices"], capture_output=True, text=True)
+        devices = result.stdout.strip().split('\n')
+
+        device_list = []
+        for device in devices:
+            match = re.match(r"Device ([0-9A-Fa-f:]+) (.+)", device)
+            if match:
+                mac_address, name = match.groups()
+                device_list.append((mac_address, name))
+        print(device_list)
+        return device_list
+    except subprocess.CalledProcessError as e:
+        print(f"❌ 블루투스 스캔 실패: {e}")
+        return []
+
 # 1. 페어링 메서드
 def pair_device(mac_address):
     try:
+        # 블루투스 기기를 스캔 후 해당 기기가 없다면 오류 처리
+        device_list = scan_bluetooth_devices()
+        if mac_address not in device_list:
+            print(f"{mac_address} 디바이스가 스캔되지 않았습니다.\n")
+            return
+
         # bluetoothctl 명령을 실행하고 대화식으로 처리
         child = pexpect.spawn('bluetoothctl', encoding='utf-8', logfile=sys.stdout)
 
