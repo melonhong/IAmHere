@@ -89,7 +89,6 @@ def main():
             scanned_devices = scan_bluetooth_devices()
             scanned_macs = [mac for mac, _ in scanned_devices]
             print(scanned_macs)
-            scan_off()
 
             enrolled_users = get_enrolled_user_ids(lecture_id)
             user_mac_map = get_mac_addresses_by_user_ids(enrolled_users)
@@ -138,6 +137,7 @@ def main():
 
         elif choice == "9":
             mac_addr = input("맥 주소: ")
+            lecture_id = input("출석 처리할 강의 ID: ").strip()
             print("블루투스가 연결되면 강의를 시작합니다...\n")
 
             # 10초 동안 연결 시도
@@ -150,12 +150,38 @@ def main():
                     break
                 time.sleep(1)  # 1초마다 체크
 
-            if connected:
-                print("강의가 시작됐습니다.\n")
-                monitor_connection(mac_addr)
-            else:
+            if not connected:
                 print("⏰ 10초 내에 연결되지 않았습니다. 강의를 시작할 수 없습니다.\n")
-        
+
+            # 강의 시작
+            print("✍️ 강의를 시작합니다. 모두 자리에 착석해주세요!")
+            try:
+                while connected:
+                    if not is_connected(mac_addr):
+                        print(f"🔨 {mac_addr} 연결이 끊어졌습니다. 강의를 종료합니다.")
+                        break
+                    else:
+                        # 블루투스 출석 반복
+                        print("========= 블루투스 기기 스캔 시작 =========")
+                        scanned_devices = scan_bluetooth_devices()
+                        scanned_macs = [mac for mac, _ in scanned_devices]
+                        print(scanned_macs)
+
+                        enrolled_users = get_enrolled_user_ids(lecture_id)
+                        user_mac_map = get_mac_addresses_by_user_ids(enrolled_users)
+
+                        for user_id in enrolled_users:
+                            mac = user_mac_map.get(user_id)
+                            if mac in scanned_macs:
+                                result = add_attendance(user_id, lecture_id, method="Bluetooth", status="1차출석완료")
+                                print(f"✅ 사용자 {user_id} 출석 처리됨") if result else print(f"❌ 사용자 {user_id} 출석 실패")
+                            else:
+                                result = add_attendance(user_id, lecture_id, method="Bluetooth", status="1차출석실패")
+                                print(f"❌ 사용자 {user_id} 결석 처리됨") if result else print(f"⚠️ 사용자 {user_id} 결석 기록 실패")
+                    time.sleep(10)  # 10초마다 체크
+            except KeyboardInterrupt:
+                print("\n모니터링을 수동으로 종료했습니다.")
+
         elif choice == "0":
 	            print("프로그램을 종료합니다.")
 	            break
