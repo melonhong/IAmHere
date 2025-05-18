@@ -1,3 +1,4 @@
+from fingerprint import *
 from db import *
 
 def main():
@@ -100,7 +101,10 @@ def main():
 
         elif choice == "5":
             user_id = input("지문 등록할 사용자 ID: ").strip()
-            if fingerprint_dao.register_fingerprint(user_id):
+            fingerprint_data = scan_fingerprint()
+            result = fingerprint_dao.add_fingerprint(user_id, fingerprint_data)
+            print(result)
+            if fingerprint_dao.add_fingerprint(user_id, fingerprint_data):
                 print("✅ 지문 등록 완료")
             else:
                 print("❌ 지문 등록 실패")
