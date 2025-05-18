@@ -1,4 +1,4 @@
-from .lecturer_connection import (
+from .bluetoothctl import (
     scan_bluetooth_devices,
     pair_device,
     connect_device,
