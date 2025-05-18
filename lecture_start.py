@@ -29,7 +29,10 @@ def main():
 
         elif choice == "7":
             lecture_id = input("출석 처리할 강의 ID: ").strip()
-            professor_id = (lecture_dao.get_professor_by_id(lecture_id) or {}).get('professor_id')
+            lecture_data = lecture_dao.get_lecture_by_id(lecture_id)
+            print(lecture_data)
+            professor_id = lecture_data['professor_id']
+            lecture_title = lecture_data['title']
             mac_addr = (bluetooth_dao.get_mac_by_user_id(professor_id) or {}).get('mac_address')
             print("블루투스가 연결되면 강의를 시작합니다...\n")
 
@@ -95,7 +98,9 @@ def main():
 
                 print(f"{user_id}번 학생의 지문 인식을 시작합니다...")
 
-                send_notification("테스트", "테스트 강의")
+                user_data = user_dao.get_user_by_id(user_id)
+                student_name = user_data['name']
+                send_check(student_name, lecture_title)
 
                 fingerprint_data = fingerprint_dao.get_fingerprint_by_user_id(user_id)
 
@@ -104,15 +109,18 @@ def main():
 
                 for attempt in range(1, max_attempts + 1):
                     print(f"🔁 지문 인증 시도 {attempt}/{max_attempts}")
-                    if verify_fingerprint(fingerprint_data):
+
+                    if verify_fingerprint(fingerprint_data): # 지문 인식 성공 시
                         if attendance_dao.add_attendance(user_id, lecture_id, method="Both", status="2차출석완료"):
                             print(f"✅ 사용자 {user_id}의 출석 처리 완료")
                         else:
                             print(f"❌ 사용자 {user_id}의 출석 기록 실패")
                         success = True
+                        send_result(student_name, success)
                         break
-                    else:
+                    else: # 지문 인식 실패 시
                         print(f"❌ 지문 인증 실패 (시도 {attempt})")
+                        send_result(student_name, success)
 
                 if not success:
                     attendance_dao.add_attendance(user_id, lecture_id, method="Fingerprint", status="2차출석실패")
@@ -124,6 +132,9 @@ def main():
                 attendance_dao.add_attendance(user_id, lecture_id, method="Fingerprint", status="2차출석제외")
                 print(f"⚠️ 사용자 {user_id}는 지문 인증 대상이 아니므로 2차출석제외 처리됨")
 
+        elif choice == "9":
+            send_check("test", "test")
+            send_result("test", True)
         elif choice == "0":
             print("프로그램을 종료합니다.")
             break
