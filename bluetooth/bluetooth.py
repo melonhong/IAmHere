@@ -27,7 +27,6 @@ def add_device(user_id, mac_address, device_name):
 
 # 유저의 아이디들을 토대로 맥 주소들을 반환 
 def get_mac_addresses_by_user_ids(user_ids):
-    """여러 사용자 ID에 대한 블루투스 MAC 주소 맵 조회 (user_id -> mac_address)"""
     if not user_ids:
         return {}
 
@@ -43,3 +42,16 @@ def get_mac_addresses_by_user_ids(user_ids):
     conn.close()
     
     return {row['user_id']: row['mac_address'] for row in rows}
+
+# 유저 아이디를 토대로 강의자의 맥 주소를 반환 
+def get_mac_addresses_by_user_id(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(f"""
+        SELECT mac_address FROM bluetooth_devices
+        WHERE user_id = %s
+    """, (user_id))
+    device = cursor.fetchone()
+    conn.close()
+    
+    return device
