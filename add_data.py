@@ -1,14 +1,15 @@
-from bluetooth import *
-from fingerprint import register_fingerprint, verify_fingerprint
-from user import *
-from lecture import add_lecture
-from enrollment import add_enrollment, get_enrolled_user_ids
-from attendance import add_attendance
-from db import initialize_database
-import time
+from db import *
 
 def main():
     initialize_database()
+
+    user_dao = UserDAO()
+    student_dao = StudentDAO()
+    professor_dao = ProfessorDAO()
+    lecture_dao = LectureDAO()
+    enrollment_dao = EnrollmentDAO()
+    bluetooth_dao = BluetoothDeviceDAO()
+    fingerprint_dao = FingerprintDAO()
 
     while True:
         print("\n===== 메인 메뉴 =====")
@@ -19,7 +20,7 @@ def main():
         print("5. 지문 등록")
         print("0. 종료")
 
-        choice = input("선택 (0-7): ").strip()
+        choice = input("선택 (0-5): ").strip()
 
         if choice == "1":
             login_id = input("아이디 입력: ").strip()
@@ -37,25 +38,29 @@ def main():
                 role = roles.get(num)
 
                 if role == 'professor':
-                    user_id = add_user(login_id, password, name, 'professor')
+                    user_id = user_dao.add_user(login_id, password, name, 'professor')
                     if user_id is None:
                         print("❌ 사용자 등록 실패")
-                        break  # add_user 실패 시 while 종료
+                        break
                     department = input("담당 학과: ").strip()
-                    add_professor(user_id, department)
-                    print("✅ 교수 등록 완료")
-                    break  # 교수 등록 후 while 종료
+                    if professor_dao.add_professor(user_id, department):
+                        print("✅ 교수 등록 완료")
+                    else:
+                        print("❌ 교수 등록 실패")
+                    break
 
                 elif role == 'student':
-                    user_id = add_user(login_id, password, name, 'student')
+                    user_id = user_dao.add_user(login_id, password, name, 'student')
                     if user_id is None:
                         print("❌ 사용자 등록 실패")
-                        break  # add_user 실패 시 while 종료
+                        break
                     major = input("학과: ").strip()
                     student_number = input("학번: ").strip()
-                    add_student(user_id, major, student_number)
-                    print("✅ 학생 등록 완료")
-                    break  # 학생 등록 후 while 종료
+                    if student_dao.add_student(user_id, major, student_number):
+                        print("✅ 학생 등록 완료")
+                    else:
+                        print("❌ 학생 등록 실패")
+                    break
 
                 else:
                     print(f"잘못된 입력입니다. 다시 선택해주세요.\n")
@@ -63,16 +68,15 @@ def main():
             else:
                 print("❌ 사용자 등록 실패")
 
-
         elif choice == "2":
             title = input("강의명: ").strip()
             day = input("요일 (월~금): ").strip()
-            lecturer_id = input("강의자 아이디: ").strip()
+            professor_id = input("강의자 ID: ").strip()
             start_time = input("시작 시간 (HH:MM:SS): ").strip()
             end_time = input("종료 시간 (HH:MM:SS): ").strip()
             start_date = input("시작 날짜 (YYYY-MM-DD): ").strip()
             end_date = input("종료 날짜 (YYYY-MM-DD): ").strip()
-            if add_lecture(title, day, lecturer_id, start_time, end_time, start_date, end_date):
+            if lecture_dao.add_lecture(title, day, professor_id, start_time, end_time, start_date, end_date):
                 print("✅ 강의 등록 완료")
             else:
                 print("❌ 강의 등록 실패")
@@ -80,7 +84,7 @@ def main():
         elif choice == "3":
             user_id = input("사용자 ID: ").strip()
             lecture_id = input("강의 ID: ").strip()
-            if add_enrollment(user_id, lecture_id):
+            if enrollment_dao.add_enrollment(user_id, lecture_id):
                 print("✅ 수강 신청 완료")
             else:
                 print("❌ 수강 신청 실패")
@@ -88,22 +92,22 @@ def main():
         elif choice == "4":
             user_id = input("등록할 사용자 ID: ").strip()
             mac_address = input("블루투스 MAC 주소: ").strip()
-            name = input("블루투스 장치 이름: ").strip()
-            if add_device(user_id, mac_address, name):
-                print(f"✅ 블루투스 장치 추가 완료: {name} ({mac_address})")
+            device_name = input("블루투스 장치 이름: ").strip()
+            if bluetooth_dao.add_bluetooth_device(user_id, mac_address, device_name):
+                print(f"✅ 블루투스 장치 추가 완료: {device_name} ({mac_address})")
             else:
                 print("❌ 블루투스 장치 추가 실패")
 
         elif choice == "5":
             user_id = input("지문 등록할 사용자 ID: ").strip()
-            if register_fingerprint(user_id):
+            if fingerprint_dao.register_fingerprint(user_id):
                 print("✅ 지문 등록 완료")
             else:
                 print("❌ 지문 등록 실패")
 
         elif choice == "0":
-	            print("프로그램을 종료합니다.")
-	            break
+            print("프로그램을 종료합니다.")
+            break
 
         else:
             print("❌ 잘못된 입력입니다. 다시 시도하세요.")
