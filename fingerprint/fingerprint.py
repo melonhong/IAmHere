@@ -1,14 +1,12 @@
 import json
-import pymysql
 import time
 from pyfingerprint.pyfingerprint import PyFingerprint
-from db import get_db_connection
 
 # 지문 센서 초기화
 def initialize_sensor():
     start_time = time.time()
     sensor = None
-    
+
     while time.time() - start_time < 5:  # 5초 동안 시도
         try:
             sensor = PyFingerprint('/dev/ttyAMA0', 57600, 0xFFFFFFFF, 0x00000000)
@@ -17,12 +15,12 @@ def initialize_sensor():
         except Exception:
             pass
         time.sleep(0.1)  # CPU 부하 줄이기
-    
+
     print("❌ 지문 센서 응답 시간 초과 (5초)")
     return None
 
 # 지문 등록
-def register_fingerprint(user_id):
+def scan_fingerprint():
     sensor = initialize_sensor()
     if not sensor:
         return False
@@ -36,43 +34,16 @@ def register_fingerprint(user_id):
     fingerprint_data = sensor.downloadCharacteristics(0x01)
     fingerprint_json = json.dumps(fingerprint_data)
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    try:
-        cursor.execute("""
-            INSERT INTO fingerprints (user_id, fingerprint_template)
-            VALUES (%s, %s)
-            ON DUPLICATE KEY UPDATE fingerprint_template = VALUES(fingerprint_template)
-        """, (user_id, fingerprint_json))
-        conn.commit()
-        print(f"✅ 사용자 {user_id}의 지문이 저장되었습니다.")
-        return True
-    except pymysql.Error as e:
-        print("❌ 데이터베이스 오류:", e)
-        return False
-    finally:
-        cursor.close()
-        conn.close()
+    return fingerprint_json
 
 # 지문 인증
-def verify_fingerprint(user_id):
+def verify_fingerprint(fingerprint_data):
     sensor = initialize_sensor()
     if not sensor:
         return False
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
     try:
-        cursor.execute("SELECT fingerprint_template FROM fingerprints WHERE user_id = %s", (user_id,))
-        result = cursor.fetchone()
-
-        if not result:
-            print("❌ 해당 사용자 ID의 지문 데이터가 없습니다.")
-            return False
-
-        stored_fingerprint = json.loads(result['fingerprint_template'])
+        stored_fingerprint = json.loads(fingerprint_data['fingerprint_template'])
 
         print("지문을 센서에 올려주세요...")
         while not sensor.readImage():
@@ -89,11 +60,6 @@ def verify_fingerprint(user_id):
             print("❌ 지문이 일치하지 않습니다.")
             return False
 
-    except pymysql.Error as e:
-        print("❌ 데이터베이스 오류:", e)
+    except Exception as e:
+        print(f"❌ 지문 인증 중 오류 발생: {e}")
         return False
-
-    finally:
-        cursor.close()
-        conn.close()
-
