@@ -17,8 +17,8 @@ def main():
         print("3. 수강 신청")
         print("4. 블루투스 장치 수동 추가")
         print("5. 지문 등록")
-        print("6. 1차 출석: 블루투스 자동 출석 처리")
-        print("7. 2차 출석: 지문 인증 및 출석 기록")
+        print("6. 블루투스 페어링")
+        print("7. 강의를 시작합니까?")
         print("0. 종료")
 
         choice = input("선택 (0-7): ").strip()
@@ -83,39 +83,70 @@ def main():
                 print("❌ 지문 등록 실패")
 
         elif choice == "6":
-            lecture_id = input("출석 처리할 강의 ID: ").strip()
-
-            print("=== 블루투스 기기 스캔 시작 ===")
-            scanned_devices = scan_bluetooth_devices()
-            scanned_macs = [mac for mac, _ in scanned_devices]
-            print(scanned_macs)
-
-            enrolled_users = get_enrolled_user_ids(lecture_id)
-            user_mac_map = get_mac_addresses_by_user_ids(enrolled_users)
-
-            for user_id in enrolled_users:
-                mac = user_mac_map.get(user_id)
-                if mac in scanned_macs:
-                    result = add_attendance(user_id, lecture_id, method="Bluetooth", status="1차출석완료")
-                    print(f"✅ 사용자 {user_id} 출석 처리됨") if result else print(f"❌ 사용자 {user_id} 출석 실패")
-                else:
-                    result = add_attendance(user_id, lecture_id, method="Bluetooth", status="1차출석실패")
-                    print(f"❌ 사용자 {user_id} 결석 처리됨") if result else print(f"⚠️ 사용자 {user_id} 결석 기록 실패")
-
+            mac_addr = input("페어링 할 맥 주소: ")
+            pair_device(mac_addr)
 
         elif choice == "7":
-            selected_user_ids = input("지문 인증할 사용자 ID들 (띄어쓰기로 구분, 예: 1 2 3): ").strip().split()
-            selected_user_ids = [int(uid) for uid in selected_user_ids]
-            lecture_id = input("출석할 강의 ID: ").strip()
-            enrolled_users = get_enrolled_user_ids(lecture_id)  # ['1', '2', '3', '4', '5']
-            print(selected_user_ids)
-            print(enrolled_users)
+            mac_addr = input("맥 주소: ")
+            lecture_id = input("출석 처리할 강의 ID: ").strip()
+            print("블루투스가 연결되면 강의를 시작합니다...\n")
 
-            for user_id in selected_user_ids:
+            # 강의자의 휴대폰에 10초 동안 블루투스 연결 시도
+            start_time = time.time()
+            connected = False
+
+            while time.time() - start_time < 10:
+                if is_connected(mac_addr):
+                    connected = True
+                    break
+                time.sleep(1)  # 1초마다 체크
+
+            # 연결에 실패하여 강의를 시작하지 못함
+            if not connected:
+                print("⏰ 10초 내에 연결되지 않았습니다. 강의를 시작할 수 없습니다.\n")
+
+            # 강의 시작
+            print("✍️ 강의를 시작합니다. 모두 자리에 착석해주세요!")
+            misbehaving_students = set() # 블루투스 출석에 실패한 학생들의 아이디 집합(중복값을 제거하기 위함)
+            enrolled_users = get_enrolled_user_ids(lecture_id) # 해당 강의를 신청한 학생 리스트
+            user_mac_map = get_mac_addresses_by_user_ids(enrolled_users) # 학생들의 맥 주소 리스트
+
+            try:
+                while connected:
+                    if not is_connected(mac_addr):
+                        print(f"🔨 {mac_addr} 연결이 끊어졌습니다. 강의를 종료합니다.")
+                        break
+                    else:
+                        # 블루투스 출석 반복
+                        print("========= 블루투스 기기 스캔 시작 =========")
+                        scanned_devices = scan_bluetooth_devices() # 스캔한 디바이스 리스트
+                        print(scanned_devices)
+
+                        for user_id in enrolled_users:
+                            mac = user_mac_map.get(user_id) # 학생 아이디로 맥 주소를 가져옴
+                            if mac in scanned_devices:
+                                result = add_attendance(user_id, lecture_id, method="Bluetooth", status="1차출석완료")
+                                print(f"✅ 사용자 {user_id} 출석 처리됨") if result else print(f"❌ 사용자 {user_id} 출석 실패")
+                            else:
+                                result = add_attendance(user_id, lecture_id, method="Bluetooth", status="1차출석실패")
+                                print(f"❌ 사용자 {user_id} 결석 처리됨") if result else print(f"⚠️ 사용자 {user_id} 결석 기록 실패")
+                                misbehaving_students.add(user_id)
+                    time.sleep(10)  # 10초마다 체크
+            except KeyboardInterrupt:
+                print("\n모니터링을 수동으로 종료했습니다.")
+
+            print(f"블루투스 출석을 실패한 학생들! 😡 지문 출석을 하세요!")
+            misbehaving_students_list = list(misbehaving_students) # 집합을 리스트로 변환
+            print(f"블루투스 출석에 실패한 학생들: {misbehaving_students_list}\n")
+
+            # 블루투스 출석에 실패한 학생들의 지문 인식 출석 시작
+            enrolled_users = get_enrolled_user_ids(lecture_id)
+
+            for user_id in misbehaving_students_list:
                 if user_id not in enrolled_users:
                     print(f"❌ 사용자 {user_id}는 이 강의에 수강 신청되어 있지 않습니다.")
                     return 
-
+                print(f"{user_id}번 학생의 지문 인식을 시작합니다...")
                 if verify_fingerprint(user_id):
                     if add_attendance(user_id, lecture_id, method="Both", status="2차출석완료"):
                         print(f"✅ 사용자 {user_id}의 출석 처리 완료")
@@ -126,70 +157,15 @@ def main():
                     print(f"❌ 사용자 {user_id} 지문 인증 실패 (출석 실패 처리됨)")
 
             # 인증하지 않은 학생들 처리
-            not_verified_users = [user_id for user_id in enrolled_users if user_id not in selected_user_ids]
+            not_verified_users = [user_id for user_id in enrolled_users if user_id not in misbehaving_students]
             for user_id in not_verified_users:
                 add_attendance(user_id, lecture_id, method="Fingerprint", status="2차출석제외")
                 print(f"⚠️ 사용자 {user_id}는 지문 인증 대상이 아니므로 2차출석제외 처리됨")
 
-        elif choice == "8":
-            mac_addr = input("페어링 할 맥 주소: ")
-            pair_device(mac_addr)
-
-        elif choice == "9":
-            mac_addr = input("맥 주소: ")
-            lecture_id = input("출석 처리할 강의 ID: ").strip()
-            print("블루투스가 연결되면 강의를 시작합니다...\n")
-
-            # 10초 동안 연결 시도
-            start_time = time.time()
-            connected = False
-
-            while time.time() - start_time < 10:
-                if is_connected(mac_addr):
-                    connected = True
-                    break
-                time.sleep(1)  # 1초마다 체크
-
-            if not connected:
-                print("⏰ 10초 내에 연결되지 않았습니다. 강의를 시작할 수 없습니다.\n")
-
-            # 강의 시작
-            print("✍️ 강의를 시작합니다. 모두 자리에 착석해주세요!")
-            misbehaving_students = []
-            try:
-                while connected:
-                    if not is_connected(mac_addr):
-                        print(f"🔨 {mac_addr} 연결이 끊어졌습니다. 강의를 종료합니다.")
-                        break
-                    else:
-                        # 블루투스 출석 반복
-                        print("========= 블루투스 기기 스캔 시작 =========")
-                        scanned_devices = scan_bluetooth_devices()
-                        print(scanned_devices)
-
-                        enrolled_users = get_enrolled_user_ids(lecture_id)
-                        user_mac_map = get_mac_addresses_by_user_ids(enrolled_users)
-
-                        for user_id in enrolled_users:
-                            mac = user_mac_map.get(user_id)
-                            if mac in scanned_devices:
-                                result = add_attendance(user_id, lecture_id, method="Bluetooth", status="1차출석완료")
-                                print(f"✅ 사용자 {user_id} 출석 처리됨") if result else print(f"❌ 사용자 {user_id} 출석 실패")
-                            else:
-                                result = add_attendance(user_id, lecture_id, method="Bluetooth", status="1차출석실패")
-                                print(f"❌ 사용자 {user_id} 결석 처리됨") if result else print(f"⚠️ 사용자 {user_id} 결석 기록 실패")
-                                misbehaving_students.append(user_id)
-                    time.sleep(10)  # 10초마다 체크
-            except KeyboardInterrupt:
-                print("\n모니터링을 수동으로 종료했습니다.")
-
-            print(f"블루투스 출석을 실패한 학생들! 😡 지문 출석을 하세요!\n")
-            print(misbehaving_students)
-
         elif choice == "0":
 	            print("프로그램을 종료합니다.")
 	            break
-	    
+
         else:
             print("❌ 잘못된 입력입니다. 다시 시도하세요.")
 

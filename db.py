@@ -17,15 +17,37 @@ def initialize_database():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # users 테이블
+    # users 테이블 생성
     cursor.execute("""
+        -- users 테이블 (기본 사용자 정보)
         CREATE TABLE IF NOT EXISTS users (
             user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-            student_id VARCHAR(100) NOT NULL,
-            name VARCHAR(100) NOT NULL,
-            major VARCHAR(255) NOT NULL,
-            role ENUM('강의자', '수강생') NOT NULL 
-        )
+            login_id VARCHAR(100) UNIQUE NOT NULL,         -- 로그인용 ID
+            password VARCHAR(100) NOT NULL,                -- 로그인용 비밀번호
+            name VARCHAR(100) NOT NULL,                    -- 사용자 이름
+            role ENUM('student', 'professor') NOT NULL     -- 사용자 역할
+        );
+    """)
+
+    # students 테이블 생성
+    cursor.execute("""
+        -- students 테이블 (학생 정보)
+        CREATE TABLE IF NOT EXISTS students (
+            student_id BIGINT PRIMARY KEY,                 -- users.user_id 참조
+            major VARCHAR(255) NOT NULL,                    -- 전공
+            student_number VARCHAR(50) UNIQUE NOT NULL,     -- 학번
+            FOREIGN KEY (student_id) REFERENCES users(user_id) ON DELETE CASCADE
+        );
+    """)
+
+    # professors 테이블 생성
+    cursor.execute("""
+        -- professors 테이블 (교수 정보)
+        CREATE TABLE IF NOT EXISTS professors (
+            professor_id BIGINT PRIMARY KEY,               -- users.user_id 참조
+            department VARCHAR(255) NOT NULL,               -- 학과
+            FOREIGN KEY (professor_id) REFERENCES users(user_id) ON DELETE CASCADE
+        );
     """)
 
     # lectures 테이블
@@ -34,12 +56,12 @@ def initialize_database():
             lecture_id BIGINT PRIMARY KEY AUTO_INCREMENT,
             title VARCHAR(255) NOT NULL,
             day ENUM('월','화','수','목','금') NOT NULL,
-            lecturer_id BIGINT NOT NULL,
+            professor_id BIGINT NOT NULL,
             start_time TIME NOT NULL,
             end_time TIME NOT NULL,
             start_date DATE NOT NULL,
             end_date DATE NOT NULL,
-            FOREIGN KEY (lecturer_id) REFERENCES users(user_id) ON DELETE CASCADE
+            FOREIGN KEY (professor_id) REFERENCES professors(professor_id) ON DELETE CASCADE
         )
     """)
 

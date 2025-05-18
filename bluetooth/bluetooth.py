@@ -3,24 +3,6 @@ import re
 import datetime
 from db import get_db_connection
 
-# 블루투스 기기 스캔 후 MAC 주소와 이름 리스트 반환
-def scan_bluetooth_devices():
-    try:
-        subprocess.run(["bluetoothctl", "--timeout", "5", "scan", "on"], check=True)
-        result = subprocess.run(["bluetoothctl", "devices"], capture_output=True, text=True)
-        devices = result.stdout.strip().split('\n')
-
-        device_list = []
-        for device in devices:
-            match = re.match(r"Device ([0-9A-Fa-f:]+) (.+)", device)
-            if match:
-                mac_address, name = match.groups()
-                device_list.append((mac_address, name))
-        return device_list
-    except subprocess.CalledProcessError as e:
-        print(f"❌ 블루투스 스캔 실패: {e}")
-        return []
-
 # 새로운 기기를 bluetooth_device 테이블에 추가
 def add_device(user_id, mac_address, device_name):
     conn = None
