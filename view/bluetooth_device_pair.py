@@ -5,7 +5,7 @@ from view.components.labeled_form import LabeledForm
 from bluetooth import *
 import threading
 
-def open_bluetooth_device_register_window(root):
+def open_bluetooth_device_pair_window(root):
     controller = BluetoothDeviceController()
     window = tk.Toplevel(root)
     window.title("강의자의 블루투스 기기 페어링")
