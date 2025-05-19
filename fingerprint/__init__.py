@@ -1,5 +1,5 @@
 from .fingerprint import (
     initialize_sensor,
-    register_fingerprint,
+    scan_fingerprint,
     verify_fingerprint
 )
