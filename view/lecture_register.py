@@ -17,10 +17,10 @@ def open_lecture_register_window(root):
     entries = []
 
     for i, label_text in enumerate(labels):
-        tk.Label(window, text=label_text).grid(row=i, column=0, sticky="e")
-        entry = tk.Entry(window)
+        tk.Label(window, text=label_text).grid(row=i, column=0, sticky="e") # 라벨 만들기
+        entry = tk.Entry(window) # 입력 필드 만들기
         entry.grid(row=i, column=1)
-        entries.append(entry)
+        entries.append(entry) # 입력 필드 리스트에 생성한 입력 필드 추가
 
     # 요일 콤보박스 별도 추가
     tk.Label(window, text="요일 (월~금)").grid(row=len(labels), column=0, sticky="e")
@@ -30,8 +30,9 @@ def open_lecture_register_window(root):
     day_combobox.grid(row=len(labels), column=1)
     day_combobox.current(0)  # 기본값 '월' 설정
 
-    # 제출 버튼
+    # 제출
     def submit():
+        # 사용자 입력값 수집
         title = entries[0].get().strip()
         professor_id = entries[1].get().strip()
         start_time = entries[2].get().strip()
@@ -47,4 +48,5 @@ def open_lecture_register_window(root):
         else:
             messagebox.showerror("실패", "강의 등록 실패")
 
+    # 등록 버튼
     tk.Button(window, text="등록", command=submit).grid(row=len(labels)+1, column=0, columnspan=2, pady=10)
