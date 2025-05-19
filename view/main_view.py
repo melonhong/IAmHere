@@ -4,6 +4,8 @@ from view.lecture_register import open_lecture_register_window
 from view.enrollment_register import open_enrollment_register_window
 from view.bluetooth_device_register import open_bluetooth_device_register_window
 from view.fingerprint_register import open_fingerprint_register_window
+from view.bluetooth_device_pair import open_bluetooth_device_pair_window
+from view.attendance import open_attendance_window
 
 def run_gui():
     root = tk.Tk()
@@ -17,6 +19,8 @@ def run_gui():
     tk.Button(root, text="수강신청", command=lambda: open_enrollment_register_window(root), width=30).pack(pady=5)
     tk.Button(root, text="블루투스 기기 등록", command=lambda: open_bluetooth_device_register_window(root), width=30).pack(pady=5)
     tk.Button(root, text="지문 등록", command=lambda: open_fingerprint_register_window(root), width=30).pack(pady=5)
+    tk.Button(root, text="블루투스 기기 페어링", command=lambda: open_bluetooth_device_pair_window(root), width=30).pack(pady=5)
+    tk.Button(root, text="출석 시작", command=lambda: open_attendance_window(root), width=30).pack(pady=5)
     tk.Button(root, text="종료", command=root.quit, width=30).pack(pady=5)
 
     root.mainloop()
