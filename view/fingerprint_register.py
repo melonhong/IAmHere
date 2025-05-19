@@ -37,4 +37,4 @@ def open_fingerprint_register_window(root):
             messagebox.showerror("실패", "지문 등록 실패")
 
     # 등록 버튼
-    tk.Button(window, text="등록", command=submit).grid(row=len(labels)+1, column=0, columnspan=2, pady=10)
+    tk.Button(window, text="등록", command=submit).grid(row=2, column=0, columnspan=2, pady=10)
