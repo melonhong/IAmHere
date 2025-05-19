@@ -1,4 +1,4 @@
-from db.db_manager import DBManager
+from model.db_manager import DBManager
 
 class UserDAO(DBManager):
     def __init__(self):
