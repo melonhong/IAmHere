@@ -1,5 +1,5 @@
 import tkinter as tk
-from view.user_register_view import open_user_register_window
+from view.user_register import open_user_register_window
 
 def run_gui():
     root = tk.Tk()
