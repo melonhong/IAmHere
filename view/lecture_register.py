@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from controllers.lecture_controller import LectureController
+from view.components.labeled_form import LabeledForm
 
 def open_lecture_register_window(root):
     controller = LectureController()
@@ -14,13 +15,9 @@ def open_lecture_register_window(root):
         "시작 시간 (HH:MM:SS)", "종료 시간 (HH:MM:SS)",
         "시작 날짜 (YYYY-MM-DD)", "종료 날짜 (YYYY-MM-DD)"
     ]
-    entries = []
+    form = LabeledForm(window, labels)
+    form.grid(row=0, column=0, columnspan=2, padx=10, pady=10)
 
-    for i, label_text in enumerate(labels):
-        tk.Label(window, text=label_text).grid(row=i, column=0, sticky="e") # 라벨 만들기
-        entry = tk.Entry(window) # 입력 필드 만들기
-        entry.grid(row=i, column=1)
-        entries.append(entry) # 입력 필드 리스트에 생성한 입력 필드 추가
 
     # 요일 콤보박스 별도 추가
     tk.Label(window, text="요일 (월~금)").grid(row=len(labels), column=0, sticky="e")
@@ -33,15 +30,18 @@ def open_lecture_register_window(root):
     # 제출
     def submit():
         # 사용자 입력값 수집
-        title = entries[0].get().strip()
-        professor_id = entries[1].get().strip()
-        start_time = entries[2].get().strip()
-        end_time = entries[3].get().strip()
-        start_date = entries[4].get().strip()
-        end_date = entries[5].get().strip()
+        values = form.get_values()
         day = day_var.get()
 
-        success = controller.register_lecture(title, day, professor_id, start_time, end_time, start_date, end_date)
+        success = controller.register_lecture(
+            values["강의명"], 
+            day,
+            values["강의자 ID"],
+            values["시작 시간 (HH:MM:SS)"],
+            values["종료 시간 (HH:MM:SS)"],
+            values["시작 날짜 (YYYY-MM-DD)"],
+            values["종료 날짜 (YYYY-MM-DD)"],
+        )
 
         if success:
             messagebox.showinfo("성공", "강의 등록 완료")
