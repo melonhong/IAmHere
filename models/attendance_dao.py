@@ -1,4 +1,4 @@
-from model.db_manager import DBManager
+from models.db_manager import DBManager
 
 class AttendanceDAO(DBManager):
     def __init__(self):

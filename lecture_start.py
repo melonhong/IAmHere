@@ -1,4 +1,4 @@
-from db import *
+from models import *
 from bluetooth import *
 from fingerprint import *
 from notifier import *

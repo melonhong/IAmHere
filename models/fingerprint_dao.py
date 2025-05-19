@@ -1,6 +1,6 @@
 import json
 from pyfingerprint.pyfingerprint import PyFingerprint
-from model.db_manager import DBManager
+from models.db_manager import DBManager
 
 class FingerprintDAO(DBManager):
     def __init__(self):

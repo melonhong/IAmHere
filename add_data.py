@@ -1,5 +1,5 @@
 from fingerprint import *
-from db import *
+from models import *
 
 def main():
     initialize_database()
