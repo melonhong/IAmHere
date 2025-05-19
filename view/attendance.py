@@ -52,13 +52,13 @@ def open_attendance_window(root):
                 return
 
             log("✅ 연결 성공! 블루투스 출석을 시작합니다.")
-            misbehaving = controller.process_attendance(
+            misbehaving_students = controller.process_attendance(
                 lecture_id, mac_addr, enrolled_students, user_mac_map
             )
 
-            log(f"⚠️ 출석 실패자: {list(misbehaving)}")
+            log(f"⚠️ 출석 실패자: {list(misbehaving_students)}")
             log("🧪 2차 지문 출석을 시작합니다...")
-            controller.finalize_attendance(enrolled_students, misbehaving, lecture_id, lecture_title)
+            controller.finalize_attendance(enrolled_students, misbehaving_students, lecture_id, lecture_title)
 
             log("✅ 전체 출석 처리 완료")
 
