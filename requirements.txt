@@ -1,0 +1,5 @@
+pymysql
+pyfingerprint
+python-dotenv
+pexpect
+requests

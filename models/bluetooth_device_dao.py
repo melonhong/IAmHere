@@ -1,4 +1,4 @@
-from db.db_manager import DBManager
+from models.db_manager import DBManager
 
 class BluetoothDeviceDAO(DBManager):
     def __init__(self):

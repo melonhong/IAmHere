@@ -4,7 +4,7 @@ import pexpect
 import sys
 import re
 
-# 블루투스 기기 스캔 후 MAC 주소  리스트 반환
+# 블루투스 기기 스캔 후 MAC 주소 리스트 반환
 def scan_bluetooth_devices():
     try:
         subprocess.run(["bluetoothctl", "--timeout", "10", "scan", "on"], check=True)
@@ -52,16 +52,18 @@ def pair_device(mac_address):
         else:
             print("❌ 페어링 중 오류가 발생했습니다.")
             child.sendline('exit')
-            return
+            return False
 
         # 페어링 완료 후 bluetoothctl 종료
         child.sendline('exit')
         child.close()
 
         print("✅ 페어링이 완료되었습니다.")
+        return True
         
     except pexpect.ExceptionPexpect as e:
         print(f"❌ 예외 발생: {e}")
+        return False
 
 # 2. 연결 메서드
 def connect_device(mac_address):
