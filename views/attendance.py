@@ -4,14 +4,13 @@ from controllers.attendance_controller import AttendanceController
 from bluetooth import is_connected
 import threading
 import time
-import traceback
 
 def open_attendance_window(root):
     window = tk.Toplevel(root)
-    window.title("📘 Start Attendance")
+    window.title("📘 출석 시작")
     window.geometry("500x400")
 
-    tk.Label(window, text="Enter Lecture ID:").pack(pady=10)
+    tk.Label(window, text="강의 ID를 입력하세요:").pack(pady=10)
     lecture_entry = tk.Entry(window)
     lecture_entry.pack()
 
@@ -25,19 +24,19 @@ def open_attendance_window(root):
     def run_attendance_process(lecture_id):
         controller = AttendanceController()
         try:
-            log("Loading lecture information...")
+            log("강의 정보 불러오는 중...")
             lecture_id, lecture_title, mac_addr, enrolled_students, user_mac_map = controller.get_attendance_context(lecture_id)
 
             if not mac_addr:
-                log("❌ Could not find professor's Bluetooth address.")
-                messagebox.showerror("Address Error", "Could not find professor's Bluetooth address.")
+                log("❌ 교수님의 블루투스 주소를 찾을 수 없습니다.")
+                messagebox.showerror("주소 오류", "교수님의 블루투스 주소를 찾을 수 없습니다.")
                 return
 
-            log(f"📡 Professor Bluetooth Address: {mac_addr}")
-            log(f"📚 Lecture Title: {lecture_title}")
-            log(f"👨‍🎓 Number of Enrolled Students: {len(enrolled_students)}")
-            log(f"👨‍🎓 Enrolled Students: {enrolled_students}")
-            log("⏳ Attempting to connect via Bluetooth...")
+            log(f"📡 교수 블루투스 주소: {mac_addr}")
+            log(f"📚 강의 제목: {lecture_title}")
+            log(f"👨‍🎓 출석 대상 학생 수: {len(enrolled_students)}")
+            log(f"👨‍🎓 출석 대상 학생 목록: {enrolled_students}")
+            log("⏳ 블루투스 연결 시도 중...")
 
             start_time = time.time()
             connected = False
@@ -48,32 +47,31 @@ def open_attendance_window(root):
                 time.sleep(1)
 
             if not connected:
-                log("❌ Bluetooth connection failed")
-                messagebox.showerror("Connection Failed", "Failed to connect to professor's Bluetooth device.")
+                log("❌ 블루투스 연결 실패")
+                messagebox.showerror("연결 실패", "교수님의 블루투스 장치 연결에 실패했습니다.")
                 return
 
-            log("✅ Connection successful! Starting Bluetooth attendance.")
+            log("✅ 연결 성공! 블루투스 출석을 시작합니다.")
             misbehaving_students = controller.process_attendance(
                 lecture_id, mac_addr, enrolled_students, user_mac_map
             )
 
-            log(f"⚠️ Attendance failed for: {list(misbehaving_students)}")
-            log("🧪 Starting fingerprint verification...")
-            controller.finalize_attendance(enrolled_students, misbehaving_students, lecture_id, lecture_title, logger=log)
+            log(f"⚠️ 출석 실패자: {list(misbehaving_students)}")
+            log("🧪 2차 지문 출석을 시작합니다...")
+            controller.finalize_attendance(enrolled_students, misbehaving_students, lecture_id, lecture_title)
 
-            log("✅ Attendance process completed.")
+            log("✅ 전체 출석 처리 완료")
 
         except Exception as e:
-            log(f"[Error] {str(e)}")
-            log(traceback.format_exc())
-            messagebox.showerror("Error Occurred", str(e))
+            log(f"[오류] {str(e)}")
+            messagebox.showerror("오류 발생!!!!", str(e))
 
     def start_attendance():
         lecture_id = lecture_entry.get().strip()
         if not lecture_id:
-            messagebox.showwarning("Input Error", "Please enter a Lecture ID.")
+            messagebox.showwarning("입력 오류", "강의 ID를 입력하세요.")
             return
         threading.Thread(target=run_attendance_process, args=(lecture_id,), daemon=True).start()
 
-    start_button = tk.Button(window, text="Start Attendance", command=start_attendance)
+    start_button = tk.Button(window, text="출석 시작", command=start_attendance)
     start_button.pack(pady=10)
