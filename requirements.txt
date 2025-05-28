@@ -3,4 +3,4 @@ pyfingerprint
 python-dotenv
 pexpect
 requests
-Crypto
+pycryptodome
