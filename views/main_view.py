@@ -1,11 +1,11 @@
 import tkinter as tk
-from view.user_register import open_user_register_window
-from view.lecture_register import open_lecture_register_window
-from view.enrollment_register import open_enrollment_register_window
-from view.bluetooth_device_register import open_bluetooth_device_register_window
-from view.fingerprint_register import open_fingerprint_register_window
-from view.bluetooth_device_pair import open_bluetooth_device_pair_window
-from view.attendance import open_attendance_window
+from views.user_register import open_user_register_window
+from views.lecture_register import open_lecture_register_window
+from views.enrollment_register import open_enrollment_register_window
+from views.bluetooth_device_register import open_bluetooth_device_register_window
+from views.fingerprint_register import open_fingerprint_register_window
+from views.bluetooth_device_pair import open_bluetooth_device_pair_window
+from views.attendance import open_attendance_window
 
 def run_gui():
     root = tk.Tk()

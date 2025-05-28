@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from controllers.user_controller import UserController
-from view.components.labeled_form import LabeledForm
+from views.components.labeled_form import LabeledForm
 
 def open_user_register_window(root):
     controller = UserController()

@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from controllers.lecture_controller import LectureController
-from view.components.labeled_form import LabeledForm
+from views.components.labeled_form import LabeledForm
 
 def open_lecture_register_window(root):
     controller = LectureController()

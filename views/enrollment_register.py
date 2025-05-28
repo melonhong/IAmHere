@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from controllers.enrollment_controller import EnrollmentController
-from view.components.labeled_form import LabeledForm
+from views.components.labeled_form import LabeledForm
 
 def open_enrollment_register_window(root):
     controller = EnrollmentController()

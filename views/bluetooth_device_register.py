@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from controllers.bluetooth_device_controller import BluetoothDeviceController
-from view.components.labeled_form import LabeledForm
+from views.components.labeled_form import LabeledForm
 
 def open_bluetooth_device_register_window(root):
     controller = BluetoothDeviceController()
