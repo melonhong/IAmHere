@@ -21,7 +21,7 @@ def open_attendance_window(root):
         output.insert(tk.END, message + "\n")
         output.see(tk.END)
 
-        def run_attendance_process(lecture_id):
+    def run_attendance_process(lecture_id):
         controller = AttendanceController()
         try:
             log("강의 정보 불러오는 중...")
