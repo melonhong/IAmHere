@@ -52,9 +52,14 @@ def open_attendance_window(root):
                 return
 
             log("✅ 연결 성공! 블루투스 출석을 시작합니다.")
-            misbehaving_students = controller.process_attendance(
-                lecture_id, mac_addr, enrolled_students, user_mac_map
-            )
+
+            n = 0
+            if connected:
+                print(f"블루투스 {n}차 출석...")
+                n += 1
+                misbehaving_students = controller.process_attendance(
+                    lecture_id, mac_addr, enrolled_students, user_mac_map
+                )
 
             log(f"⚠️ 출석 실패자: {list(misbehaving_students)}")
             log("🧪 2차 지문 출석을 시작합니다...")
