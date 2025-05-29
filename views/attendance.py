@@ -74,7 +74,7 @@ def open_attendance_window(root):
                     result = messagebox.askyesno("강의 종료 확인", "블루투스 연결이 끊어졌습니다. 강의를 종료하시겠습니까?")
                     if result:
                         log("🛑 강의 출석을 종료합니다.")
-                        controller.finalize_attendance(enrolled_students, misbehaving_students, lecture_id, lecture_title)
+                        controller.finalize_attendance(enrolled_students, misbehaving_students, lecture_id, lecture_title, log)
                         log("✅ 전체 출석 처리 완료")
                         break
                     else:
