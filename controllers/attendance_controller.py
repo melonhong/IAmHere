@@ -77,7 +77,9 @@ class AttendanceController:
                     logger(f"✅ {student_name} 지문 인식 성공 (시도 {attempt + 1}/3)")
                     success = True
                     break
-                time.sleep(1)
+                else:
+                    logger("지문 센서가 초기화 되지 않았습니다. 10초 후 다시 시도합니다.")
+                    time.sleep(10)  # 10초 대기
 
             if not success:
                 self.attendance_dao.add_attendance(user_id, lecture_id, method="Fingerprint", status="2차출석실패")
