@@ -72,6 +72,7 @@ class AttendanceController:
             success = False
 
             for attempt in range(3):
+                logger(f"{student_name} 학생의 지문 인식을 시작합니다.")
                 if verify_fingerprint(fingerprint_data):
                     self.attendance_dao.add_attendance(user_id, lecture_id, method="Both", status="2차출석완료")
                     logger(f"✅ {student_name} 지문 인식 성공 (시도 {attempt + 1}/3)")

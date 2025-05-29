@@ -90,7 +90,7 @@ def open_attendance_window(root):
 
                     if result:
                         # 강의 종료 시: 2차 지문 출석 포함한 전체 출석 마무리
-                        log("🛑 출석 종료, 지문 출석 시작...")
+                        log("🛑 블루투스 출석 종료, 지문 출석 시작...")
                         controller.finalize_attendance(enrolled_students, misbehaving_students, lecture_id, lecture_title, log)
                         log("✅ 전체 출석 처리 완료")
                         break
