@@ -21,7 +21,7 @@ def open_attendance_window(root):
         output.insert(tk.END, message + "\n")
         output.see(tk.END)
 
-    def run_attendance_process(lecture_id):
+        def run_attendance_process(lecture_id):
         controller = AttendanceController()
         try:
             log("강의 정보 불러오는 중...")
@@ -54,8 +54,10 @@ def open_attendance_window(root):
             log("✅ 연결 성공! 블루투스 출석을 시작합니다.")
         except Exception as e:
             log(f"[출석 준비 중 오류] {str(e)}")
+            return
 
         try:
+            misbehaving_students = []
             while True:
                 if is_connected(mac_addr):
                     log("📡 블루투스 연결 상태 확인됨. 출석 처리 중...")
@@ -68,19 +70,25 @@ def open_attendance_window(root):
                         log("🎉 모든 학생이 출석을 완료했습니다!")
                         break
                 else:
-                    log("🔌 블루투스 연결이 끊어졌습니다. 다시 연결 대기 중...")
+                    log("🔌 블루투스 연결이 끊어졌습니다.")
+                    result = messagebox.askyesno("강의 종료 확인", "블루투스 연결이 끊어졌습니다. 강의를 종료하시겠습니까?")
+                    if result:
+                        log("🛑 강의 출석을 종료합니다.")
+                        controller.finalize_attendance(enrolled_students, misbehaving_students, lecture_id, lecture_title)
+                        log("✅ 전체 출석 처리 완료")
+                        break
+                    else:
+                        log("🔄 출석 루프를 계속합니다. 10초 후 재시도...")
 
                 time.sleep(10)
 
-            log("🧪 2차 지문 출석을 시작합니다...")
-            controller.finalize_attendance(enrolled_students, misbehaving_students, lecture_id, lecture_title)
-
-            log("✅ 전체 출석 처리 완료")
+            if misbehaving_students:
+                log("🧪 2차 지문 출석을 시작합니다...")
+                controller.finalize_attendance(enrolled_students, misbehaving_students, lecture_id, lecture_title)
+                log("✅ 전체 출석 처리 완료")
 
         except Exception as e:
             log(f"[출석 처리 중 오류] {str(e)}")
-
-
 
     def start_attendance():
         lecture_id = lecture_entry.get().strip()
