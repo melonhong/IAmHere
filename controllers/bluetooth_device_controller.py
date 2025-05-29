@@ -9,5 +9,7 @@ class BluetoothDeviceController:
         return bool(self.bluetooth_dao.add_bluetooth_device(user_id, mac_addr, name))
     
     def get_mac_addr(self, lecture_id):
-        professor_id = self.lecture_dao.get_professor_by_id(lecture_id)
-        return self.bluetooth_dao.get_mac_by_user_id(professor_id)
+        lecture_data = self.lecture_dao.get_professor_by_id(lecture_id)
+        professor_id = lecture_data['professor_id']
+        data = self.bluetooth_dao.get_mac_by_user_id(professor_id)
+        return data['mac_address']

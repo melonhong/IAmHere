@@ -28,6 +28,7 @@ def open_bluetooth_device_pair_window(root):
     def submit():
         values = form.get_values()
         mac_addr = controller.get_mac_addr(values["강의 ID"])
+        print(mac_addr)
 
         if mac_addr:
             # 새로운 스레드에서 페어링 시도
