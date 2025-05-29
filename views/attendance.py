@@ -53,23 +53,33 @@ def open_attendance_window(root):
 
             log("✅ 연결 성공! 블루투스 출석을 시작합니다.")
 
-            n = 0
-            if connected:
-                print(f"블루투스 {n}차 출석...")
-                n += 1
-                misbehaving_students = controller.process_attendance(
-                    lecture_id, mac_addr, enrolled_students, user_mac_map
-                )
+        # 연결 유지 상태에서 출석을 주기적으로 시도
+        try:
+            while True:
+                if is_connected(mac_addr):
+                    log("📡 블루투스 연결 상태 확인됨. 출석 처리 중...")
+                    misbehaving_students = controller.process_attendance(
+                        lecture_id, mac_addr, enrolled_students, user_mac_map
+                    )
+                    log(f"⚠️ 출석 실패자: {list(misbehaving_students)}")
 
-            log(f"⚠️ 출석 실패자: {list(misbehaving_students)}")
+                    # 모든 학생이 출석했으면 루프 종료
+                    if not misbehaving_students:
+                        log("🎉 모든 학생이 출석을 완료했습니다!")
+                        break
+                else:
+                    log("🔌 블루투스 연결이 끊어졌습니다. 다시 연결 대기 중...")
+
+                # 10초마다 상태 확인
+                time.sleep(10)
+
             log("🧪 2차 지문 출석을 시작합니다...")
             controller.finalize_attendance(enrolled_students, misbehaving_students, lecture_id, lecture_title)
 
             log("✅ 전체 출석 처리 완료")
-
         except Exception as e:
-            log(f"[오류] {str(e)}")
-            messagebox.showerror("오류 발생!!!!", str(e))
+            log(f"[출석 처리 중 오류] {str(e)}")
+
 
     def start_attendance():
         lecture_id = lecture_entry.get().strip()
