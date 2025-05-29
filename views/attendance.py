@@ -68,12 +68,14 @@ def open_attendance_window(root):
 
         try:
             misbehaving_students = []  # 블루투스 출석 실패자 목록
+            n = 1 # 블루투스 출석 횟수
 
             # 출석 루프 시작
             while True:
                 if is_connected(mac_addr):
-                    # 블루투스 연결된 경우: 1차 출석 처리
-                    log("📡 블루투스 연결 상태 확인됨. 1차 블루투스 출석 시작...")
+                    # 연결이 유지된 경우: 블루투스 출석 처리
+                    log(f"📡 블루투스 연결 상태 확인됨. {n}차 블루투스 출석 시작...")
+                    n += 1
                     misbehaving_students = controller.process_attendance(
                         lecture_id, mac_addr, enrolled_students, user_mac_map
                     )
@@ -93,6 +95,7 @@ def open_attendance_window(root):
                         log("🛑 블루투스 출석 종료, 지문 출석 시작...")
                         controller.finalize_attendance(enrolled_students, misbehaving_students, lecture_id, lecture_title, log)
                         log("✅ 전체 출석 처리 완료")
+                        window.destroy()  # 등록 성공 시 창 닫기
                         break
                     else:
                         # 다시 블루투스 출석 시도

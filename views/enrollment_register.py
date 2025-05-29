@@ -25,6 +25,7 @@ def open_enrollment_register_window(root):
 
         if success:
             messagebox.showinfo("성공", "수강신청 완료")
+            window.destroy()  # 등록 성공 시 창 닫기
         else:
             messagebox.showerror("실패", "수강신청 실패")
 

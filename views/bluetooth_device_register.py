@@ -26,6 +26,7 @@ def open_bluetooth_device_register_window(root):
 
         if success:
             messagebox.showinfo("성공", "블루투스 기기 등록 완료")
+            window.destroy()  # 등록 성공 시 창 닫기
         else:
             messagebox.showerror("실패", "블루투스 기기 등록 실패")
 

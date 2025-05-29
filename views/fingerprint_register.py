@@ -21,8 +21,6 @@ def open_fingerprint_register_window(root):
         else:
             # 지문 스캔 실패
             messagebox.showerror("실패", "지문 스캔 실패")
-    tk.Button(window, text="지문 스캔", command=on_scan).grid(row=1, column=0, columnspan=2, pady=10)
-
 
     # 제출
     def submit():
@@ -33,6 +31,7 @@ def open_fingerprint_register_window(root):
 
         if success:
             messagebox.showinfo("성공", "지문 등록 완료")
+            window.destroy()  # 등록 성공 시 창 닫기
         else:
             messagebox.showerror("실패", "지문 등록 실패")
 

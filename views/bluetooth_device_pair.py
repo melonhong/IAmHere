@@ -18,6 +18,7 @@ def open_bluetooth_device_pair_window(root):
     # 페어링을 실행할 스레드 함수
     def threaded_pair(mac_addr):
         result = pair_device(mac_addr)
+        
         # 결과 메시지는 UI 스레드에서 처리해야 함
         window.after(0, lambda: (
             messagebox.showinfo("성공", "블루투스 기기 페어링 완료")
@@ -34,7 +35,7 @@ def open_bluetooth_device_pair_window(root):
             # 새로운 스레드에서 페어링 시도
             threading.Thread(target=threaded_pair, args=(mac_addr,), daemon=True).start()
         else:
-            messagebox.showerror("실패", "블루투스 기기 페어링 실패")
+            messagebox.showerror("실패", "블루투스 기기가 등록되지 않음")
 
     # 등록 버튼
     tk.Button(window, text="페어링", command=submit).grid(row=len(labels)+1, column=0, columnspan=2, pady=10)
