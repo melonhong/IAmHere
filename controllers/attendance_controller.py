@@ -71,23 +71,31 @@ class AttendanceController:
             fingerprint_data = self.fingerprint_dao.get_fingerprint_by_user_id(user_id)
             success = False
 
+            sensor = initialize_sensor()
+            if sensor is None:
+                logger("⚠️ 지문 센서가 초기화 되지 않았습니다. 10초 후 다시 시도합니다.")
+                time.sleep(10)  # 10초 대기
+
             for attempt in range(3):
                 logger(f"{student_name} 학생의 지문 인식을 시작합니다.")
+                send_check(student_name, lecture_title)
+
                 if verify_fingerprint(fingerprint_data):
                     self.attendance_dao.add_attendance(user_id, lecture_id, method="Both", status="2차출석완료")
                     logger(f"✅ {student_name} 지문 인식 성공 (시도 {attempt + 1}/3)")
                     success = True
+                    send_result(student_name, success)
                     break
                 else:
-                    logger("지문 센서가 초기화 되지 않았습니다. 10초 후 다시 시도합니다.")
-                    time.sleep(10)  # 10초 대기
+                    logger("❌ 지문이 일치하지 않습니다. 5초 후 다시 시도해주세요.")
+                    send_result(student_name, success)
+                    time.sleep(5)  # 5초 대기
 
             if not success:
                 self.attendance_dao.add_attendance(user_id, lecture_id, method="Fingerprint", status="2차출석실패")
                 logger(f"❌ {student_name} 지문 인식 실패")
 
+        # 2차 출석을 하지 않은 학생들을 처리
         not_verified_users = [uid for uid in enrolled_students if uid not in misbehaving_students]
         for user_id in not_verified_users:
             self.attendance_dao.add_attendance(user_id, lecture_id, method="Fingerprint", status="2차출석제외")
-            user_name = self.user_dao.get_user_by_id(user_id)['name']
-            logger(f"⚪ {user_name}는 블루투스로 출석 확인되어 지문 인식 제외됨")
