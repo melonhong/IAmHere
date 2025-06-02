@@ -84,7 +84,6 @@ def open_attendance_window(root):
                     if not misbehaving_students:
                         # 모든 학생 출석 완료 시 루프 종료
                         log("🎉 모든 학생이 출석을 완료했습니다!")
-                        break
                 else:
                     # 연결이 끊긴 경우: 강의 종료 여부 확인
                     log("🔌 강의자의 블루투스 연결이 끊어졌습니다.")
@@ -95,7 +94,6 @@ def open_attendance_window(root):
                         log("🛑 블루투스 출석 종료, 지문 출석 시작...")
                         controller.finalize_attendance(enrolled_students, misbehaving_students, lecture_id, lecture_title, log)
                         log("✅ 전체 출석 처리 완료")
-                        window.destroy()  # 등록 성공 시 창 닫기
                         break
                     else:
                         # 다시 블루투스 출석 시도
