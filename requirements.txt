@@ -1,0 +1,6 @@
+pymysql
+pyfingerprint
+python-dotenv
+pexpect
+requests
+pycryptodome
