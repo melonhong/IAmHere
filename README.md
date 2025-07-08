@@ -22,12 +22,14 @@
 - **소프트웨어**
   - Python 3.8+
   - RPi.GPIO
-  - `pyserial`, `bluetoothctl`, `requests` 등
+  - `bluetoothctl` `MariaDB` 등
 
 - **통신**
   - GPIO 통신 (센서 ↔ 라즈베리파이)
   - Bluetooth (기기 근접 확인)
-  - REST API (출석 정보 서버 전송)
+ 
+- **협업**
+  `Git` `Jira`
 
 ## 👀 데모 영상
 [IAmHere 시연 영상](https://youtu.be/DxXN-7ntfTQhttps://youtu.be/DxXN-7ntfTQ)
