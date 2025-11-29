@@ -33,3 +33,7 @@
 
 ## 👀 데모 영상
 [IAmHere 시연 영상](https://youtu.be/DxXN-7ntfTQhttps://youtu.be/DxXN-7ntfTQ)
+
+## 📕 발표 PDF
+[IAmHere 중간 발표](https://docs.google.com/presentation/d/15Tj_UIzK_RT4HP2at3cLzEihSnFR8IZE/edit?usp=sharing&ouid=112356249481949420666&rtpof=true&sd=true)
+[IAmHere 최종 발표](https://docs.google.com/presentation/d/178Bz70BLx255hT5UWLrawCGU6I5CUiyY/edit?usp=sharing&ouid=112356249481949420666&rtpof=true&sd=true)
